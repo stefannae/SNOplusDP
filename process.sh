@@ -3,11 +3,11 @@
 # Instructions
 # Call this script with
 # $ sh process.sh run_no run_subfile
+# or
+# $ nohup sh process.sh run_no run_subfile > run_no_run_subfile.log &
 # for all subfiles use ALL value for run_subfile
 
-# Initialization:
-
-#LD_LIBRARY_PATH=/usr/lib:$LD_LIBRARY_PATH
+# Initialization
 
 #ratVersion="6.5.2"
 #ratVersion="6.5.3"
@@ -21,20 +21,27 @@ else
   SUBRUNS=("$2")
 fi
 
+# Should add $3 for testing
+
 echo "Starting processing of run "$RUN" with subfiles "${SUBRUNS[@]}" using RAT "$ratVersion"."
 
 # File locations (should check if these exist)
+
 # INPUT
 filePath="/lstore/sno/snoplus/Data/Water/Calibration/AmBe/"
 zdabFilePath=${filePath}"L2/"
+
 # OUTPUT
+#fermiFilePath="/home/sno/stefan/AmBe/"
+#outputFilePath=${fermiFilePath}"local/rat-"${ratVersion}"/in_grid/"${RUN}
 outputFilePath=${filePath}"local/rat-"${ratVersion}"/in_grid/"${RUN}
+
 if [ ! -d "$outputFilePath" ]; then
   mkdir $outputFilePath
 fi
+
 # MACRO
 ratPath="/lstore/sno/stefan/rat/"
-#macFilePath=${ratPath}"rat-"${ratVersion}"/mac/processing/water/"
 
 for subfile in ${SUBRUNS[@]}
 do
@@ -50,34 +57,54 @@ do
       mkdir $subOutputFilePath
     fi
 
+    # If I cd here the .o and .e files do not get in the folder. Pass one dumps the files directly to lstore. I cd in the pass file.
+    cd $subOutputFilePath
+
     # FIRST PROCESSING PASS
+    pass1FilePathTemplate=$filePath"templates/AmBe_pass1.sh"
     pass1FilePath=${filePath}"local/AmBe_pass1.sh"
     echo ""
     echo "FIRST PASS"
-    echo "Parameters"
-    echo "P1: "${pass1FilePath}
-    echo "P2: "${ratPath}
-    echo "P3: "${ratVersion}
-    echo "P4: "${zdabFilePath}${zdabFileName}.zdab
-    echo "P5: "${subOutputFilePath}
-    sed -i "5s|.*|RAT_PATH=\"${ratPath}\"|" $pass1FilePath
-    sed	-i "6s|.*|RAT_VERSION=\"${ratVersion}\"|" $pass1FilePath
-    sed	-i "7s|.*|RAT_INPUT=\"${zdabFilePath}${zdabFileName}.zdab\"|" $pass1FilePath
-    sed -i "8s|.*|OUTPUT_PATH=\"${subOutputFilePath}\"|" $pass1FilePath
-    qsub $pass1FilePath
+    # Check for FIRST PASS files and submit job if needed
+    REQ_FILES=("TPMUONFOLLOWER.ratdb" "tpmuonfollowercut_${RUN}.json" "PedCut.ratdb" "MissedMuonFollower.ratdb" "LAST_MUON.ratdb" "LastAtmospheric.ratdb" "Atmospherics.ratdb")
+    for req_file in ${REQ_FILES[@]}
+    do
+      if [ ! -f "${subOutputFilePath}/${req_file}" ]
+      then
+        echo "Parameters"
+        echo "P1: "$pass1FilePath
+        echo "P2: "$ratPath
+        echo "P3: "$ratVersion
+        echo "P4: "$RUN
+        echo "P5: "$subfile
+
+       (head -5 "$pass1FilePathTemplate"; echo "RAT_PATH=\"$ratPath\""; echo "RAT_VERSION=\"$ratVersion\""; echo "RUN=\"$RUN\""; echo "SUBFILE=\"$subfile\""; tail -n +10 "$pass1FilePathTemplate") > $pass1FilePath
+
+        qsub $pass1FilePath
+        #sh $pass1FilePath
+        break
+      fi
+      echo $req_file" already exists."
+    done
+
+    #exit 0
+    #qsub $pass1FilePath
 
     # Wait for the FIRST PASS
-    REQ_FILES=("TPMUONFOLLOWER.ratdb" "tpmuonfollowercut_${RUN}.json" "PedCut.ratdb" "MissedMuonFollower.ratdb" "LAST_MUON.ratdb" "LastAtmospheric.ratdb" "Atmospherics.ratdb")
     for req_file in ${REQ_FILES[@]}
     do
       while [ ! -f "${subOutputFilePath}/${req_file}" ]
       do
-        echo "Waiting ..."
-	sleep 60
+        echo "Waiting ... 60"
+        sleep 60
       done
     done
 
+    #exit 0
+    #cd $subOutputFilePath
+
     # SECOND PROCESSING PASS
+    pass2FilePathTemplate=$filePath"templates/AmBe_pass2.sh"
     pass2FilePath=${filePath}"local/AmBe_pass2.sh"
     echo ""
     echo "SECOND PASS"
@@ -86,47 +113,49 @@ do
       echo "A second pass root file already exists."
     else
       echo "Parameters"
-      echo "P1: "${pass2FilePath}
-      echo "P2: "${ratPath}
-      echo "P3: "${ratVersion}
-      echo "P4: "${zdabFilePath}${zdabFileName}.zdab
-      echo "P5: "${subOutputFilePath}/${zdabFileName}.root
-      echo "P6: "${subOutputFilePath}
-      sed -i "5s|.*|RAT_PATH=\"${ratPath}\"|" $pass2FilePath
-      sed -i "6s|.*|RAT_VERSION=\"${ratVersion}\"|" $pass2FilePath
-      sed -i "7s|.*|RAT_INPUT=\"${zdabFilePath}${zdabFileName}.zdab\"|" $pass2FilePath
-      sed -i "8s|.*|RAT_OUTPUT=\"${subOutputFilePath}/${zdabFileName}.root\"|" $pass2FilePath
-      sed -i "9s|.*|OUTPUT_PATH=\"${subOutputFilePath}\"|" $pass2FilePath
+      echo "P1: "$pass2FilePath
+      echo "P2: "$ratPath
+      echo "P3: "$ratVersion
+      echo "P4: "$RUN
+      echo "P5: "$subfile
+
+      (head -5 "$pass2FilePathTemplate"; echo "RAT_PATH=$ratPath"; echo "RAT_VERSION=$ratVersion"; echo "RUN=$RUN"; echo "SUBFILE=$subfile"; tail -n +10 "$pass2FilePathTemplate") > $pass2FilePath
+
       qsub $pass2FilePath
+      #sh  $pass2FilePath
     fi
 
+    #exit 0
+
     # Wait for the SECOND PASS
-    # Get current and file times
+    # 1. Wait for the root file to exist
     while [ ! -f "${subOutputFilePath}/${zdabFileName}.root" ]
     do
       echo "Waiting ... 60"
       sleep 60
     done
-
-
+    # 2. Wait for the pass to finish when the file is processed at lstore
     while :
     do
+      # Get current and file times
       sysTimestamp=$(date +%s)
       rootFileTimestamp=$(stat "${subOutputFilePath}/${zdabFileName}.root" -c %Y)
       timeDiff=$(expr $sysTimestamp - $rootFileTimestamp)
-      if [ $timeDiff -lt 90 ]
+      if [ $timeDiff -lt 60 ]
       then
         echo "Time differene is "$timeDiff
-        echo "Waiting ... 180"
-      	sleep 180
+        echo "Waiting ... 120"
+      	sleep 120
       else
         break
       fi
     done
 
     # THIRD PROCESSING PASS
+    pass3FilePathTemplate=${filePath}"templates/AmBe_pass3.sh"
     pass3FilePath=${filePath}"local/AmBe_pass3.sh"
-    analysisFileName="Analysis_r0000"$RUN"_s00"$subfile"_p001"
+    #analysisFileName="Analysis_r0000"$RUN"_s00"$subfile"_p001"
+    analysisFileName="output"
     echo ""
     echo "THIRD PASS"
     if [ -f ${subOutputFilePath}/${analysisFileName}.root ]
@@ -134,18 +163,16 @@ do
       echo "A third pass root file already exists."
     else
       echo "Parameters"
-      echo "P1: "${pass3FilePath}
-      echo "P2: "${ratPath}
-      echo "P3: "${ratVersion}
-      echo "P4: "${subOutputFilePath}/${zdabFileName}.root
-      echo "P5: "${subOutputFilePath}/${analysisFileName}
-      echo "P6: "${subOutputFilePath}
-      sed -i "5s|.*|RAT_PATH=\"${ratPath}\"|" $pass3FilePath
-      sed -i "6s|.*|RAT_VERSION=\"${ratVersion}\"|" $pass3FilePath
-      sed -i "7s|.*|RAT_INPUT=\"${subOutputFilePath}/${zdabFileName}.root\"|" $pass3FilePath
-      sed -i "8s|.*|RAT_OUTPUT=\"${subOutputFilePath}/${analysisFileName}\"|" $pass3FilePath
-      sed -i "9s|.*|OUTPUT_PATH=\"${subOutputFilePath}\"|" $pass3FilePath
+      echo "P1: "$pass3FilePath
+      echo "P2: "$ratPath
+      echo "P3: "$ratVersion
+      echo "P4: "$RUN
+      echo "P5: "$subfile
+
+      (head -5 "$pass3FilePathTemplate"; echo "RAT_PATH=$ratPath"; echo "RAT_VERSION=$ratVersion"; echo "RUN=$RUN"; echo "SUBFILE=$subfile"; tail -n +10 "$pass3FilePathTemplate") > $pass3FilePath
+
       qsub $pass3FilePath
+      #sh $pass3FilePath
     fi
   else
     echo ""

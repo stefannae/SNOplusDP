@@ -2,25 +2,52 @@
 
 #$ -V
 
+# INPUTS
 RAT_PATH="/lstore/sno/stefan/rat/"
 RAT_VERSION="6.15.0"
-RAT_INPUT="/lstore/sno/snoplus/Data/Water/Calibration/AmBe/local/rat-6.15.0/in_grid/109133/0/SNOP_0000109133_000.l2.root"
-RAT_OUTPUT="/lstore/sno/snoplus/Data/Water/Calibration/AmBe/local/rat-6.15.0/in_grid/109133/0/Analysis_r0000109133_s000_p001"
-OUTPUT_PATH="/lstore/sno/snoplus/Data/Water/Calibration/AmBe/local/rat-6.15.0/in_grid/109133/0"
+RUN="109134"
+SUBFILE="2"
 
+# DATA
+FILE_NAME="SNOP_0000"$RUN"_00"$SUBFILE".l2"
+
+# relative way / scp
+FILE_PATH="rat-"$RAT_VERSION"/in_grid/"$RUN"/"$SUBFILE"/"
+ROOT_FILE=$FILE_PATH$FILE_NAME".root"
+
+# lstore way
+LSTORE_AMBE="/lstore/sno/snoplus/Data/Water/Calibration/AmBe/"
+RAT_INPUT=$LSTORE_AMBE"local/"$ROOT_FILE
+OUTPUT_PATH=$LSTORE_AMBE"local/"$FILE_PATH
+
+# fermi way
+#FERMI_AMBE="/home/sno/stefan/AmBe/"
+#OUTPUT_PATH=$FERMI_AMBE"local/"$FILE_PATH
+
+# RAT
 RAT_MACRO=${RAT_PATH}"rat-"${RAT_VERSION}"/mac/processing/water/third_pass_AmBe_processing_wSelection.mac"
-#RATDB_CONN="postgres://snoplus:dontestopmenow@pgsql.snopl.us:5400/ratdb"
+#RAT_MACRO=${RAT_PATH}"rat-"${RAT_VERSION}"/mac/processing/water/third_pass_AmBe_processing_wSelection_test.mac"
+#RATDB_CONN="postgres://snoplus:pass@pgsql.snopl.us:5400/ratdb"
 
+# INs
 #..#$ -v SGEIN1=$RAT_MACRO
-#..#$ -v SGEIN2=$RAT_INPUT
+#..#$ -v SGEIN2=$RAT_INPUT:$FILE_NAME".root"
+#..#$ -v SGEIN1=$RAT_INPUT
 
-#..#$ -v SGEOUT1=${RAT_OUTPUT}.root
-#..#$ -v SGEOUT1=${RAT_OUTPUT}.ntuple.root
+# OUTs
+#..#$ -v SGEOUT1=${OUTPUT_PATH}output.root
+#..#$ -v SGEOUT2=${OUTPUT_PATH}output.ntuple.root
+#..#$ -v SGEOUT3=${OUTPUT_PATH}rat.*.log
 
-# Default
-# Looks like solip misses liblzma.so.0 but I did not get errors all the time, sometimes it runs
+# Resources
+#..#$ -l h_vmem=2G,h_fsize=4G
+#..#$ -l h=!wn200
+#$ -l h=!(wn174|wn181|wn187|wn200|wn201|wn202|wn203|wn216)
+
+# QUEUE (default is lipq)
+#..#$ -q lipq
+# Looks like solip misses liblzma.so.0 but I did not get errors all the time, sometimes it runs.
 #..#$ -q solip
-#$ -q lipq
 
 # Env
 # Option 0
@@ -47,6 +74,12 @@ cd $OUTPUT_PATH
 
 # Job
 #rat -i $RAT_INPUT -o $RAT_OUTPUT -b $RATDB_CONN $RAT_MACRO
-rat -i $RAT_INPUT $RAT_MACRO
+#rat -i $RAT_INPUT $RAT_MACRO
+#rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
+
+#/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass3_"${RUN}"_"${SUBFILE}".log" rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
+/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass3_"${RUN}"_"${SUBFILE}".log" /lstore/sno/stefan/rat/rat-6.15.0/bin/rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
+
+#rat -i ${FILE_NAME}.root $RAT_MACRO
 
 exit 0
