@@ -3,11 +3,12 @@
 # Initialization:
 
 # on Fermi
-source ~/load-rat-water.sh
+source /lstore/sno/stefan/rat/load-rat-6.5.0.sh
+#source ~/load-rat-water.sh
 filePath="/lstore/sno/snoplus/Data/Water/Calibration/AmBe/"
-zdabFilePath=${filePath}"L2/trimmed/"
-macFilePath=${filePath}"local/rat-6.5.0/raw/"
-outputFilePath=${filePath}"local/rat-6.5.0/raw/"
+zdabFilePath=${filePath}"L2/"
+macFilePath=${filePath}"local/rat-6.5.0/raw_full/"
+outputFilePath=${filePath}"local/rat-6.5.0/raw_full/"
 
 #source ~/load-rat-water.sh
 #zdabFilePath="/lstore/sno/stefan/data/backgrounds/"
@@ -29,7 +30,7 @@ do
   for subfile in 0 1 2
   do
     #wc $r # with input file
-    zdabFileName="SNOP_0000"$r"_00"$subfile".l2.t_800_n1_16_n2_4"
+    zdabFileName="SNOP_0000"$r"_00"$subfile".l2"
     #echo ${zdabFilePath}${zdabFileName}.zdab
     if [ -f ${zdabFilePath}${zdabFileName}.zdab ]
     then
@@ -50,15 +51,15 @@ do
 	fi
 
 	# THIRD PASS
-	processedFileName="SNOP_0000"$r"_00"$subfile"_l2_t_800_n1_16_n2_4"
-	if [ -f ${outputFilePath}${processedFileName}_third_pass.root ]
-	then
-	    echo "A third pass root file already exists."
-	else
+	#processedFileName="SNOP_0000"$r"_00"$subfile"_l2"
+	#if [ -f ${outputFilePath}${processedFileName}_third_pass.root ]
+	#then
+	#    echo "A third pass root file already exists."
+	#else
            # nohup time rat -i ${outputFilePath}${zdabFileName}.root -o ${outputFilePath}${processedFileName} ${macFilePath}third_pass_analysis_processing_AmBe5-testing.mac > ${outputFilePath}${zdabFileName}.third_pass.log &
            #time rat -i ${outputFilePath}${zdabFileName}.root -o ${outputFilePath}${processedFileName} ${macFilePath}third_pass_analysis_processing_AmBe5-testing2.mac > ${outputFilePath}${zdabFileName}.third_pass.log
-           time rat -i ${outputFilePath}${zdabFileName}.root -o ${outputFilePath}${processedFileName} ${macFilePath}third_pass_AmBe_processing.mac > ${outputFilePath}${zdabFileName}.third_pass.log
-	fi
+        #   time rat -i ${outputFilePath}${zdabFileName}.root -o ${outputFilePath}${processedFileName} ${macFilePath}third_pass_AmBe_processing.mac > ${outputFilePath}${zdabFileName}.third_pass.log
+	#fi
     fi
   done
 done
