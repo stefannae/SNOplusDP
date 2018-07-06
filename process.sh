@@ -171,9 +171,36 @@ do
 
       (head -5 "$pass3FilePathTemplate"; echo "RAT_PATH=$ratPath"; echo "RAT_VERSION=$ratVersion"; echo "RUN=$RUN"; echo "SUBFILE=$subfile"; tail -n +10 "$pass3FilePathTemplate") > $pass3FilePath
 
-      qsub $pass3FilePath
+      echo "Skipping THIRD PASS. This is for the FOURTH PASS. FIX ME!"
+      #qsub $pass3FilePath
       #sh $pass3FilePath
     fi
+
+    # FOURTH PROCESSING PASS
+    # assumes the third pass was already performed and the data for a run was archived in a /backup directory at the same level with the runs (eg $ cp -a 109133 backup/) while the output files from the third pass were removed from the run folder.
+    pass4FilePathTemplate=${filePath}"templates/AmBe_pass4.sh"
+    pass4FilePath=${filePath}"local/AmBe_pass4.sh"
+    #analysisFileName="Analysis_r0000"$RUN"_s00"$subfile"_p001"
+    analysisFileName="output"
+    echo ""
+    echo "FOURTH PASS"
+    if [ -f ${subOutputFilePath}/${analysisFileName}.root ]
+    then
+      echo "A fourth pass root file already exists."
+    else
+      echo "Parameters"
+      echo "P1: "$pass4FilePath
+      echo "P2: "$ratPath
+      echo "P3: "$ratVersion
+      echo "P4: "$RUN
+      echo "P5: "$subfile
+
+      (head -5 "$pass4FilePathTemplate"; echo "RAT_PATH=$ratPath"; echo "RAT_VERSION=$ratVersion"; echo "RUN=$RUN"; echo "SUBFILE=$subfile"; tail -n +10 "$pass4FilePathTemplate") > $pass4FilePath
+
+      qsub $pass4FilePath
+      #sh $pass4FilePath
+    fi
+
   else
     echo ""
     echo "L2 file not found"${zdabFilePath}${zdabFileName}.zdab
