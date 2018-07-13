@@ -65,7 +65,7 @@ do
     cd $subOutputFilePath
 
     # FIRST PROCESSING PASS
-    pass1FilePathTemplate=$filePath"templates/AmBe_pass1.sh"
+    pass1FilePathTemplate=$filePath"local/SNOplusDP/templates/AmBe_pass1.sh"
     pass1FilePath=${subOutputFilePath}"/AmBe_pass1.sh"
     echo ""
     echo "FIRST PASS"
@@ -108,7 +108,7 @@ do
     #cd $subOutputFilePath
 
     # SECOND PROCESSING PASS
-    pass2FilePathTemplate=$filePath"templates/AmBe_pass2.sh"
+    pass2FilePathTemplate=$filePath"local/SNOplusDP/templates/AmBe_pass2.sh"
     pass2FilePath=${subOutputFilePath}"/AmBe_pass2.sh"
     echo ""
     echo "SECOND PASS"
@@ -156,7 +156,7 @@ do
     done
 
     # THIRD PROCESSING PASS
-    pass3FilePathTemplate=${filePath}"templates/AmBe_pass3.sh"
+    pass3FilePathTemplate=${filePath}"local/SNOplusDP/templates/AmBe_pass3.sh"
     pass3FilePath=${subOutputFilePath}"/AmBe_pass3.sh"
     #analysisFileName="Analysis_r0000"$RUN"_s00"$subfile"_p001"
     analysisFileName="output"
