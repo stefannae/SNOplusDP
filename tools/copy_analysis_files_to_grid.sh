@@ -23,13 +23,17 @@ linkNtuplePath=${linkTagPath}"/ntuple/"
 
 PASS="0"
 
-SUB_RUNS=("0" "1" "2")
+SUB_RUNS=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12")
 
 RUN_LIST="$1"
 
 while read RUN; do
   for SUB_FILE in ${SUB_RUNS[@]}; do
-    analysisFileName="AmBe_r0000"$RUN"_s00"$SUB_FILE"_p00"$PASS
+    if [ $SUB_FILE -gt 9 ]; then
+      analysisFileName="AmBe_r0000"$RUN"_s0"$SUB_FILE"_p00"$PASS
+    else
+      analysisFileName="AmBe_r0000"$RUN"_s00"$SUB_FILE"_p00"$PASS
+    fi
 
     # .root files
     ratdsAnalysisFile=$ratdsAnalysisPath$analysisFileName".root"

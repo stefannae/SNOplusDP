@@ -16,7 +16,7 @@ ratVersion="6.15.0"
 
 RUN="$1"
 if [ "$2" == "ALL" ]; then
-  SUBRUNS=("0" "1" "2")
+  SUBRUNS=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12")
 else
   SUBRUNS=("$2")
 fi
@@ -45,7 +45,11 @@ ratPath="/lstore/sno/stefan/rat/"
 
 for subfile in ${SUBRUNS[@]}
 do
-  zdabFileName="SNOP_0000"$RUN"_00"$subfile".l2"
+  if [ $subfile -gt 9 ]; then
+    zdabFileName="SNOP_0000"$RUN"_0"$subfile".l2"
+  else
+    zdabFileName="SNOP_0000"$RUN"_00"$subfile".l2"
+  fi
 
   if [ -f ${zdabFilePath}${zdabFileName}.zdab ]
   then

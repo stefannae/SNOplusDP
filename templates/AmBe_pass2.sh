@@ -9,7 +9,11 @@ RUN="109134"
 SUBFILE="2"
 
 # DATA
-FILE_NAME="SNOP_0000"$RUN"_00"$SUBFILE".l2"
+if [ $SUBFILE -gt 9 ]; then
+  FILE_NAME="SNOP_0000"$RUN"_0"$SUBFILE".l2"
+else
+  FILE_NAME="SNOP_0000"$RUN"_00"$SUBFILE".l2"
+fi
 
 # relative way / scp
 FILE_PATH="rat-"$RAT_VERSION"/in_grid/"$RUN"/"$SUBFILE"/"
