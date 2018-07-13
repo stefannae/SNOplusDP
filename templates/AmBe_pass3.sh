@@ -82,7 +82,7 @@ cd $OUTPUT_PATH
 #rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
 
 #/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass3_"${RUN}"_"${SUBFILE}".log" rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
-/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass3_"${RUN}"_"${SUBFILE}".log" /lstore/sno/stefan/rat/rat-6.15.0/bin/rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
+/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass3_"${RUN}"_"${SUBFILE}".log" /lstore/sno/stefan/rat/rat-6.15.0/bin/rat -d water-backg-v2 -i $RAT_INPUT $RAT_MACRO
 
 #rat -i ${FILE_NAME}.root $RAT_MACRO
 

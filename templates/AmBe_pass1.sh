@@ -101,7 +101,7 @@ cd $OUTPUT_PATH
 
 #touch ${FILE_PATH}"time_"${RUN}"_"${SUBFILE}".log"
 #/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass1_"${RUN}"_"${SUBFILE}".log" rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
-/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass1_"${RUN}"_"${SUBFILE}".log" /lstore/sno/stefan/rat/rat-6.15.0/bin/rat -d water-ndecay-v2 -i $RAT_INPUT $RAT_MACRO
+/usr/bin/time --verbose --output=${OUTPUT_PATH}"time_pass1_"${RUN}"_"${SUBFILE}".log" /lstore/sno/stefan/rat/rat-6.15.0/bin/rat -d water-backg-v2 -i $RAT_INPUT $RAT_MACRO
 
 #rat -d water-ndecay-v2 $RAT_INPUT $RAT_MACRO
 #rat -i $RAT_INPUT first_pass_data_cleaning.mac
