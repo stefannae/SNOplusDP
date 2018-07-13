@@ -66,7 +66,7 @@ do
 
     # FIRST PROCESSING PASS
     pass1FilePathTemplate=$filePath"templates/AmBe_pass1.sh"
-    pass1FilePath=${filePath}"local/AmBe_pass1.sh"
+    pass1FilePath=${subOutputFilePath}"/AmBe_pass1.sh"
     echo ""
     echo "FIRST PASS"
     # Check for FIRST PASS files and submit job if needed
@@ -109,7 +109,7 @@ do
 
     # SECOND PROCESSING PASS
     pass2FilePathTemplate=$filePath"templates/AmBe_pass2.sh"
-    pass2FilePath=${filePath}"local/AmBe_pass2.sh"
+    pass2FilePath=${subOutputFilePath}"/AmBe_pass2.sh"
     echo ""
     echo "SECOND PASS"
     if [ -f ${subOutputFilePath}/${zdabFileName}.root ]
@@ -157,7 +157,7 @@ do
 
     # THIRD PROCESSING PASS
     pass3FilePathTemplate=${filePath}"templates/AmBe_pass3.sh"
-    pass3FilePath=${filePath}"local/AmBe_pass3.sh"
+    pass3FilePath=${subOutputFilePath}"/AmBe_pass3.sh"
     #analysisFileName="Analysis_r0000"$RUN"_s00"$subfile"_p001"
     analysisFileName="output"
     echo ""
