@@ -12,8 +12,7 @@ processingPath=${tagPath}"/in_grid/"
 ratdsAnalysisPath=${tagPath}"/ratds/"
 ntupleAnalysisPath=${tagPath}"/ntuple/"
 
-#PASS="0"
-PASS="1"
+PASS="0"
 
 SUB_RUNS=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12")
 
