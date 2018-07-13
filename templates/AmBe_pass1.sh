@@ -64,7 +64,7 @@ TABLE7="tpmuonfollowercut_"${RUN}".json"
 # Resources
 #..#$ -l h_vmem=2G,h_fsize=2G
 #..#$ -l h_vmem=4G
-#$ -l h=!(wn174|wn181|wn187|wn200|wn201|wn202|wn203|wn216)
+#$ -l h=!((wn163|wn164|wn166|wn167|wn168|wn169|wn170|wn174|wn177|wn178|wn179|wn181|wn183|wn184|wn185|wn187|wn200|wn201|wn202|wn203|wn216)
 
 # QUEUE (default is lipq)
 #..#$ -q lipq
