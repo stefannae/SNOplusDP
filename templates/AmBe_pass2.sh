@@ -50,7 +50,7 @@ RAT_MACRO=$RAT_PATH"rat-"$RAT_VERSION"/mac/processing/water/second_pass_processi
 
 # Resources
 #..#$ -l h=!wn200
-#$ -l h=!((wn163|wn164|wn166|wn167|wn168|wn169|wn170|wn174|wn177|wn178|wn179|wn181|wn183|wn184|wn185|wn187|wn200|wn201|wn202|wn203|wn216)
+#$ -l h=!(wn163|wn164|wn166|wn167|wn168|wn169|wn170|wn174|wn177|wn178|wn179|wn181|wn183|wn184|wn185|wn187|wn200|wn201|wn202|wn203|wn216)
 
 # QUEUE (default is lipq)
 #..#$ -q lipq
